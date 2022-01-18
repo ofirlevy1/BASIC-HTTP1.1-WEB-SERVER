@@ -6,7 +6,7 @@ HTTPRequestProcessor::HTTPRequestProcessor(string request) : requestStr(request)
 	response.headers.insert({ CONTENT_LENGTH, "0" });
 }
 
-/*This function interprets the request. It takes the request (that was received as a stirng), and stores the data in the relevat objects.*/
+/*This function interprets the request. It takes the request (that was received as a string), and stores the data in the relevat objects.*/
 void HTTPRequestProcessor::interpretRequest()
 {
 	setResponseStatusLine({ "Bad Request", 400 });
@@ -22,6 +22,7 @@ void HTTPRequestProcessor::interpretRequest()
 			request.body = requestStr.substr(currentIndex, requestStr.length() - currentIndex);
 		}
 	}
+
 	catch (string str)
 	{
 		response.body = "Server: Error when parsing the HTTP request: \n";
@@ -493,11 +494,7 @@ void HTTPRequestProcessor::Get()
 {
 	updatePathAccordingToQuery();
 	request.requestLine.uri.path = SERVER_BASE_FILE + request.requestLine.uri.path;
-
-	
-
 	ifstream fileStream(request.requestLine.uri.path);
-
 	response.headers[DATE] = getDate();
 
 	if (fileStream.is_open()) {

@@ -2,7 +2,8 @@
 using namespace std;
 using namespace http;
 
-int main(){
+int main()
+{
 
 	SocketsHandler socketsHandler;
 	socketsHandler.run();

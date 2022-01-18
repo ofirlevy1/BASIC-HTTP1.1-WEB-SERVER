@@ -1,7 +1,8 @@
 #include "SocketsHandler.h"
 using namespace std;
 
-namespace http {
+namespace http 
+{
 	/*Sockets handler constructor. it initialize the listen socket.*/
 	SocketsHandler::SocketsHandler()
 	{
@@ -9,7 +10,6 @@ namespace http {
 		{
 			throw (string)"DEBUG - Server : Error at WSAStartup()";
 			return;
-
 		}
 
 		listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -43,9 +43,8 @@ namespace http {
 		}
 
 		cout << "server is ready for requests" << endl;
-		
-
 	}
+
 	SocketsHandler::~SocketsHandler()
 	{
 		// Closing connections and Winsock.
@@ -54,17 +53,17 @@ namespace http {
 		WSACleanup();
 	}
 
-	/*run function is the main loop of the server. This loop is devided to 3 simple steps:
+	/*run function is the main loop of the server. This loop is divided into 3 simple steps:
 	1. Adding the sockets to receive set and send set according to their state
 	2. Using select function and removing irrelevant sockets from sets
-	3. Handeling the sockets that either received new message or send new message*/
+	3. Handling the sockets that either received new message or (able to) send new message*/
 	void SocketsHandler::run()
 	{
-		while (true) {
-
+		while (true) 
+		{
 			FD_ZERO(&waitRecv);
 			FD_ZERO(&waitSend);
-			
+
 			addSocketsToSets();
 			useSelect();
 			handleSockets();
@@ -81,8 +80,8 @@ namespace http {
 		FD_SET(listenSocket, &waitRecv); //put the main socket in waitRecv
 
 		auto itr = socketsList.begin();
-		while (itr != socketsList.end()){
-
+		while (itr != socketsList.end())
+		{
 			status = itr->getStatus();
 
 			if (status.receiveStatus == RECEIVE) {
@@ -97,30 +96,26 @@ namespace http {
 
 			++itr;
 		}
-
 	}
 
 	/*This function uses select function to remove from the fd sets the irelevant sockets*/
-	void SocketsHandler::useSelect() {
-
+	void SocketsHandler::useSelect() 
+	{
 		int nfd;
-
 		//debugPrintSockets();
-
 		nfd = select(0, &waitRecv, &waitSend, NULL, &selectTimeOut); 
-
 		if (nfd == SOCKET_ERROR)
 		{
 			string eror = "DEBUG - Server: Error at select(): " + to_string(WSAGetLastError());
 			WSACleanup();
 			throw eror;
 		}
-
-
 	}
 
-	/*This function is the main handler of the relevant sockets(sockets that has to perform one of the following: receive/handle request/ send.
-	Listen socket is responsible for receiving new connections. A new socket is created for every new connection.*/
+	/*This function is the main handler of the relevant sockets(sockets that
+	has to perform one of the following: receive/handle, request/send.
+	Listen socket is responsible for receiving new connections. 
+	A new socket is created for every new connection.*/
 	void SocketsHandler::handleSockets() {
 
 		handleListenSocket(); //check for new connections 
@@ -211,7 +206,9 @@ namespace http {
 		cout << "Client " << inet_ntoa(from.sin_addr) << ":" << ntohs(from.sin_port) << " is connected." << endl;
 
 		unsigned long flag = 1;
-		if (ioctlsocket(msgSocket, FIONBIO, &flag) != 0)  // Set the socket to be in non-blocking mode.
+		// Set the socket to be in non-blocking mode.(to prevent blocking if after the SELECT,
+		//the status has changed for some reason)
+		if (ioctlsocket(msgSocket, FIONBIO, &flag) != 0)  
 		{
 			string eror = "DEBUG - Error at ioctlsocket(): " + to_string(WSAGetLastError());
 			cout << eror;

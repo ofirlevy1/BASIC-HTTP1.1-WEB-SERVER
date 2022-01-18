@@ -2,13 +2,12 @@
 #include <fstream>
 using namespace std;
 namespace http {
-	SocketClass::SocketClass() {
+	SocketClass::SocketClass() 
+	{
 		//waiting for...
-
 		status.receiveStatus = RECEIVE;
 		status.requestStatus = IDLE;
 		status.sendStatus = IDLE;
-
 		time(&time_last_byte_received);
 	}
 	
@@ -21,7 +20,8 @@ namespace http {
 	/*This function is responsible for receiving a new messege. When a new messege is received, a snapshot of the internal clock is being taken.
 	Taking the snapshot is important since the socket should be removed if it hasn't received a new messege for more than 2 minutes.
 	When the messege is received, it is being pushed to a requests queue for further handling.*/
-	void SocketClass::receiveMessage(){
+	void SocketClass::receiveMessage()
+	{
 
 		string eror;
 		char tempBuffer[BUFFER_MAX_LEN];
@@ -50,7 +50,7 @@ namespace http {
 		}
 	}
 
-	/*This function pops out from the requests queue the next request, and using HTTPRequest processor to handle the request.
+	/*This function pops out the next request from the requests queue , and using HTTPRequest processor to handle the request.
 	The object HTTPRequestProcessor is responsible to handle the request according to the http protocol. When it finished to process the 
 	request, the response is pushed to reponse queue for further handling. the sockets class's status is being updated to "SEND", which means
 	that the socket class is ready for sending the response.*/
@@ -75,20 +75,14 @@ namespace http {
 
 	}
 
-	/*This function pops from the response queue the next response, and sending it to the client*/
+	/*This function pops the next response from the response queue, and sends it to the client*/
 	void SocketClass::sendMessage()
 	{
 		int bytesSent = 0;
 		char response[BUFFER_MAX_LEN];
-
 		string nextResponseInQueue = responseBuffers.front();
-
-
 		strcpy_s(response, nextResponseInQueue.c_str());
-	
 		responseBuffers.pop();
-
-		
 
 		bytesSent = send(socket, response, (int)strlen(response), 0);
 		if (bytesSent == SOCKET_ERROR)
@@ -107,13 +101,9 @@ namespace http {
 	{
 		time_t time_now;
 		time(&time_now);
-
 		if (time_now - time_last_byte_received > SOCKET_TIMEOUT)
 			return true;
-
 		return false;
-
-		
 	}
 
 	bool SocketClass::operator==(const SocketClass& other) const
