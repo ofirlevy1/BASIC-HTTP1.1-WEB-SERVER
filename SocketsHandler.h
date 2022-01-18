@@ -11,18 +11,16 @@ using namespace std;
 #include <time.h>
 
 
-namespace http {
-
+namespace http 
+{
 	const TIMEVAL selectTimeOut = { 120,0 };
-
-	class SocketsHandler {
+	class SocketsHandler 
+	{
 
 	public:
 		SocketsHandler();
 		~SocketsHandler();
 		void run();
-		
-
 
 	private:
 		void addSocketsToSets();
@@ -35,7 +33,6 @@ namespace http {
 		void removeSockets();
 
 		void debugPrintSockets();
-	
 		
 		WSAData wsaData;
 		sockaddr_in serverService;
@@ -43,7 +40,6 @@ namespace http {
 		list<SocketClass> socketsList;
 		list<list<SocketClass>::iterator> socketsToRemove;
 		
-
 		fd_set waitRecv;
 		fd_set waitSend;
 		
